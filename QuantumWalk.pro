@@ -10,7 +10,9 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    lattice.cpp
+    lattice.cpp \
+    qw2c.cpp
 
 HEADERS += \
-    lattice.h
+    lattice.h \
+    qw2c.h
