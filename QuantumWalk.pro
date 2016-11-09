@@ -11,8 +11,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     lattice.cpp \
-    qw2c.cpp
+    qw2c.cpp \
+    qw3c.cpp
 
 HEADERS += \
     lattice.h \
-    qw2c.h
+    qw2c.h \
+    qw3c.h

@@ -6,17 +6,19 @@
 class QW2c
 {
 public:
-    QW2c(int t);
+    QW2c(int s);
 
     double** getCoin(double a);
     void applyCoin(double **c);
     void applyDisplacement();
+    double* getProbabilities();
 
 private:
-    Lattice* qw[2];
+    Lattice<double>* qw[2];
+    double* p;
     int step;
+    int t;
+    int N;
 };
-
-double **getCoin(double a);
 
 #endif // QW2C_H
