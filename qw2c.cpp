@@ -46,10 +46,7 @@ void QW2c::applyCoin(double **c)
         for (int j=0; j<2; j++)
             temp[j] = qw[j]->at(i);
         for (int j=0; j<2; j++)
-        {
-            qw[0]->set(i, c[0][0]*temp[0] + c[0][1]*temp[1]);
-            qw[1]->set(i, c[1][0]*temp[0] + c[1][1]*temp[1]);
-        }
+            qw[j]->set(i, c[j][0]*temp[0] + c[j][1]*temp[1]);
     }
 }
 

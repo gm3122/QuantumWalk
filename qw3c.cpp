@@ -47,14 +47,10 @@ void QW3c::applyCoin(complex **c)
 
     for (int i=-step; i<=step; i++)
     {
-        for (int j=0; j<2; j++)
+        for (int j=0; j<3; j++)
             temp[j] = qw[j]->at(i);
-        for (int j=0; j<2; j++)
-        {
-            qw[0]->set(i, c[0][0]*temp[0] + c[0][1]*temp[1] + c[0][2]*temp[2]);
-            qw[1]->set(i, c[1][0]*temp[0] + c[1][1]*temp[1] + c[1][2]*temp[2]);
-            qw[2]->set(i, c[2][0]*temp[0] + c[2][1]*temp[1] + c[2][2]*temp[2]);
-        }
+        for (int j=0; j<3; j++)
+            qw[j]->set(i, c[j][0]*temp[0] + c[j][1]*temp[1] + c[j][2]*temp[2]);
     }
 }
 
