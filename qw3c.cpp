@@ -75,3 +75,8 @@ double *QW3c::getProbabilities()
 
     return p;
 }
+
+double QW3c::getReturnAmplitude()
+{
+    return std::real(qw[1]->at(0));
+}

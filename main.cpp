@@ -20,40 +20,51 @@ int main(int argc, char *argv[])
     QTextStream out(&file);
 
     // parameters
-    int t = 1000000;
+    int t = 1000;
 
     // variables
-    double *p;
+//    double *p;
+    double amp[t+1];
+
 
 //    QW2c qw(t);
-//    double **c = qw.getCoin(M_PI/4);
     QW3c qw(t);
-    complex **c;
+    complex **c = qw.getCoin(M_PI/4);
+    amp[0] = qw.getReturnAmplitude();
+//    complex **c;
 //    complex **c1 = qw.getCoin(M_PI/3);
 //    complex **c2 = qw.getCoin(M_PI/5);
-    qsrand(0);
+//    qsrand(0);
 
     for (int i=0; i<t; i++)
     {
 //        c = i%2 ? c1 : c2;
-        c = qw.getCoin(M_PI*qrand()/2/RAND_MAX);
+//        c = qw.getCoin(M_PI*qrand()/2/RAND_MAX);
         qw.applyCoin(c);
-        delete c;
+//        delete c;
         qw.applyDisplacement();
-        p = qw.getProbabilities();
+//        p = qw.getProbabilities();
+        amp[i+1] = qw.getReturnAmplitude();
 //        int k = 0;
 //        for (int j=-t; j<=t; j++) {
 //            out << i << " " << j << " " << p[k] << endl;
 //            k++;
 //        }
-        out << endl;
+//        out << endl;
 //        out << i+1 << " " << getVariance(p,t) << endl;
     }
 //    out << endl;
-    int k = 0;
-    for (int j=-t; j<=t; j++) {
-        out << j << " " << p[k] << endl;
-        k++;
+//    int k = 0;
+//    for (int j=-t; j<=t; j++) {
+//        out << j << " " << p[k] << endl;
+//        k++;
+//    }
+
+    for (int i=0; i<=t; i++) {
+        for (int j=0; j<=t; j++) {
+            out << i << " " << j << " " << amp[std::abs(j-i)] << endl;
+        }
+        out << endl;
     }
 
     qDebug() << "end";

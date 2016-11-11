@@ -16,6 +16,7 @@ public:
     void applyCoin(complex **c);
     void applyDisplacement();
     double* getProbabilities();
+    double getReturnAmplitude();
 
 private:
     Lattice<complex>* qw[3];
