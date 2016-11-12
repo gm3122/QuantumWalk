@@ -8,7 +8,10 @@
 #include "qw2c.h"
 #include "qw3c.h"
 
+void qw2(int t, QTextStream &out);
+void qw3(int t, QTextStream &out);
 double getVariance(double *p, int t);
+bool* fibo(int t);
 
 int main(int argc, char *argv[])
 {
@@ -22,43 +25,57 @@ int main(int argc, char *argv[])
     // parameters
     int t = 1000;
 
-    // variables
-//    double *p;
-    double amp[t+1];
+    qsrand(0);
+//    qw2(t, out);
+    qw3(t, out);
 
+    qDebug() << "end";
 
-//    QW2c qw(t);
-    QW3c qw(t);
-    complex **c = qw.getCoin(M_PI/4);
-    amp[0] = qw.getReturnAmplitude();
-//    complex **c;
-//    complex **c1 = qw.getCoin(M_PI/3);
-//    complex **c2 = qw.getCoin(M_PI/5);
-//    qsrand(0);
+    return a.exec();
+}
+
+void qw2(int t, QTextStream &out)
+{
+    double *p;
+
+    QW2c qw(t);
+    double **c = qw.getCoin(M_PI/4);
 
     for (int i=0; i<t; i++)
     {
-//        c = i%2 ? c1 : c2;
-//        c = qw.getCoin(M_PI*qrand()/2/RAND_MAX);
         qw.applyCoin(c);
-//        delete c;
         qw.applyDisplacement();
-//        p = qw.getProbabilities();
-        amp[i+1] = qw.getReturnAmplitude();
-//        int k = 0;
-//        for (int j=-t; j<=t; j++) {
-//            out << i << " " << j << " " << p[k] << endl;
-//            k++;
-//        }
-//        out << endl;
+        p = qw.getProbabilities();
+
+        // probabilities
+        int k = 0;
+        for (int j=-t; j<=t; j++) {
+            out << i+1 << " " << j << " " << p[k] << endl;
+            k++;
+        }
+        out << endl;
+        // variance
 //        out << i+1 << " " << getVariance(p,t) << endl;
     }
-//    out << endl;
-//    int k = 0;
-//    for (int j=-t; j<=t; j++) {
-//        out << j << " " << p[k] << endl;
-//        k++;
-//    }
+}
+
+void qw3(int t, QTextStream &out)
+{
+    double amp[t+1];
+
+    QW3c qw(t);
+    complex **c = qw.getCoin(M_PI/4);
+
+    amp[0] = qw.getReturnAmplitude();
+
+    for (int i=0; i<t; i++)
+    {
+        // c = qw.getCoin(M_PI*qrand()/2/RAND_MAX);
+        qw.applyCoin(c);
+        // delete c;
+        qw.applyDisplacement();
+        amp[i+1] = qw.getReturnAmplitude();
+    }
 
     for (int i=0; i<=t; i++) {
         for (int j=0; j<=t; j++) {
@@ -66,10 +83,6 @@ int main(int argc, char *argv[])
         }
         out << endl;
     }
-
-    qDebug() << "end";
-
-    return a.exec();
 }
 
 double getVariance(double *p, int t)
@@ -78,9 +91,15 @@ double getVariance(double *p, int t)
     int i = 0;
     for (int j=-t; j<=t; j++) {
         v += p[i]*j*j;
-//        qDebug() << j << " " << p[i];
         i++;
     }
-//    qDebug() << endl << v << endl << endl;
     return v;
+}
+
+bool* fibo(int t)
+{
+    bool f[t];
+
+
+    return f;
 }
