@@ -12,7 +12,7 @@ class QW3c
 public:
     QW3c(int s);
 
-    complex** getCoin(double a);
+    static complex** getCoin(double a);
     void applyCoin(complex **c);
     void applyDisplacement();
     double* getProbabilities();

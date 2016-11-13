@@ -8,7 +8,7 @@ class QW2c
 public:
     QW2c(int s);
 
-    double** getCoin(double a);
+    static double** getCoin(double a);
     void applyCoin(double **c);
     void applyDisplacement();
     double* getProbabilities();

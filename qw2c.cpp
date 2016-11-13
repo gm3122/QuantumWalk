@@ -2,8 +2,6 @@
 
 #include "qw2c.h"
 
-using namespace std;
-
 // 0 down 1 up
 
 QW2c::QW2c(int s)
