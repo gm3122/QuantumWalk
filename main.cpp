@@ -80,6 +80,7 @@ void qw3(int t, QTextStream &out)
             out << i << " " << j << " " << qw->getReturnAmplitude() << endl;
             delete qw;
         }
+        out << endl;
         qDebug() << i;
     }
 }
