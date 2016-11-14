@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     QTextStream out(&file);
 
     // parameters
-    int t = 1000;
+    int t = 1000000;
 
 //    qsrand(0);
 //    qw2(t, out);
@@ -69,20 +69,28 @@ void qw3(int t, QTextStream &out)
     complex **c_a = QW3c::getCoin(M_PI/3);
     complex **c_b = QW3c::getCoin(M_PI/5);
 
-    for (int i=0; i<t; i++) {
-        for (int j=0; j<t; j++) {
-            qw = new QW3c(t);
-            for (int k=std::min(i,j); k<std::max(i,j); k++) {
-                c = f[k] ? c_b : c_a;
-                qw->applyCoin(c);
-                qw->applyDisplacement();
-            }
-            out << i << " " << j << " " << qw->getReturnAmplitude() << endl;
-            delete qw;
-        }
-        out << endl;
-        qDebug() << i;
+    qw = new QW3c(t);
+    for (int k=0; k<t; k++) {
+        c = f[k] ? c_b : c_a;
+        qw->applyCoin(c);
+        qw->applyDisplacement();
+        out << k << " " << qw->getReturnAmplitude() << endl;
     }
+
+//    for (int i=0; i<t; i++) {
+//        for (int j=0; j<t; j++) {
+//            qw = new QW3c(t);
+//            for (int k=std::min(i,j); k<std::max(i,j); k++) {
+//                c = f[k] ? c_b : c_a;
+//                qw->applyCoin(c);
+//                qw->applyDisplacement();
+//            }
+//            out << i << " " << j << " " << qw->getReturnAmplitude() << endl;
+//            delete qw;
+//        }
+//        out << endl;
+//        qDebug() << i;
+//    }
 }
 
 double getVariance(double *p, int t)
