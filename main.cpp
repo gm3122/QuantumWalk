@@ -10,6 +10,7 @@
 
 void qw2(int t, QTextStream &out);
 void qw3(int t, QTextStream &out);
+void quaternion(double *p, double *a, double *b);
 double getVariance(double *p, int t);
 void fibo(int t, bool *f);
 
@@ -18,13 +19,44 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     // open file in write mode
-    QFile file("fibo.dat");
+    QFile file("test.dat");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
 
     // parameters
-    int t = 1000000;
+    int t = 10000;
+    int N = 1;
 
+    double theta = M_PI/4;
+    double q_theta[4] = { cos(theta), 0, -sin(theta), 0 };
+    double q_k[4] = { 0,0,0,0 };
+    double p[4] = { 1,0,0,0 };
+    double k;
+    double I = 0;
+    bool f[t];
+    fibo(t,f);
+    for (int i=1; i<N; i++) {
+        k = i*M_PI/N/2;
+        q_k[0] = cos(k);
+        q_k[3] = -sin(k);
+        p[0] = 1;
+        p[1] = 0;
+        p[2] = 0;
+        p[3] = 0;
+        for (int j=0; j<t; j++) {
+            theta = f[j] ? M_PI/4 : 0;
+            theta = M_PI/4;
+            q_theta[0] = cos(theta);
+            q_theta[2] = -sin(theta);
+            quaternion(p, p, q_theta);
+            quaternion(p, p, q_k);
+        }
+        I += p[3]*p[3]/(1-p[0]*p[0]);
+        out << (double) i/N << " " << k << " " << p[3]*p[3]/(1-p[0]*p[0]) << " " << I/N << endl;
+
+//        out << p[0] << " " << p[1] << " " << p[2] << " " << p[3] << endl;
+    }
+    qDebug() << I/N;
 //    qsrand(0);
 //    qw2(t, out);
     qw3(t, out);
@@ -61,36 +93,28 @@ void qw2(int t, QTextStream &out)
 
 void qw3(int t, QTextStream &out)
 {
-    bool f[t];
-    fibo(t, f);
-
     QW3c *qw;
+    double theta=M_PI/4;
+    double r;
+    double S = 0;
     complex **c;
-    complex **c_a = QW3c::getCoin(M_PI/3);
-    complex **c_b = QW3c::getCoin(M_PI/5);
+    complex **c1 = QW3c::getCoin(theta);
+    complex **c2 = QW3c::getCoin(0);
+    bool f[t];
+    fibo(t,f);
 
     qw = new QW3c(t);
     for (int k=0; k<t; k++) {
-        c = f[k] ? c_b : c_a;
+        c = f[k] ? c1 : c2;
+//        c = c1;
         qw->applyCoin(c);
         qw->applyDisplacement();
-        out << k << " " << qw->getReturnAmplitude() << endl;
+//        r = qw->getReturnAmplitude() - 1 + sin(theta);
+//        r *= std::sqrt(2*M_PI*(k+1));
+        S += qw->getReturnAmplitude();
+        out << k+1 << " " << qw->getReturnAmplitude() << " " << S << endl;
     }
-
-//    for (int i=0; i<t; i++) {
-//        for (int j=0; j<t; j++) {
-//            qw = new QW3c(t);
-//            for (int k=std::min(i,j); k<std::max(i,j); k++) {
-//                c = f[k] ? c_b : c_a;
-//                qw->applyCoin(c);
-//                qw->applyDisplacement();
-//            }
-//            out << i << " " << j << " " << qw->getReturnAmplitude() << endl;
-//            delete qw;
-//        }
-//        out << endl;
-//        qDebug() << i;
-//    }
+    qDebug() << qw->getReturnAmplitude();
 }
 
 double getVariance(double *p, int t)
@@ -121,4 +145,16 @@ void fibo(int t, bool *f)
         k[1] = k[2];
         k[2] = k[0];
     }
+}
+
+void quaternion(double *p, double *a, double *b)
+{
+    double _p[4];
+    _p[0] = a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3];
+    _p[1] = a[0]*b[1] + a[1]*b[0] + a[2]*b[3] - a[3]*b[2];
+    _p[2] = a[0]*b[2] + a[2]*b[0] - a[1]*b[3] + a[3]*b[1];
+    _p[3] = a[0]*b[3] + a[3]*b[0] + a[1]*b[2] - a[2]*b[1];
+
+    for (int i=0; i<4; i++)
+        p[i] = _p[i];
 }
