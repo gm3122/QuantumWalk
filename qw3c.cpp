@@ -26,16 +26,16 @@ complex **QW3c::getCoin(double a)
     c[2] = new complex[3];
 
     // set coin
-    const complex b(0,sin(2*a)/sqrt(2));
+    const complex b(sin(2*a)/sqrt(2),0);
 
     c[0][0] = cos(a)*cos(a);
     c[0][1] = b;
-    c[0][2] = sin(a)*sin(a);
-    c[1][0] = b;
+    c[0][2] = -sin(a)*sin(a);
+    c[1][0] = -b;
     c[1][1] = cos(2*a);
     c[1][2] = -b;
     c[2][0] = c[0][2];
-    c[2][1] = -b;
+    c[2][1] = b;
     c[2][2] = c[0][0];
 
     return c;
