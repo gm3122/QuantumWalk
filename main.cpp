@@ -8,6 +8,12 @@
 #include "qw2c.h"
 #include "qw3c.h"
 
+const QString folderpath = "../../Plots/";
+
+void simple_qw();
+void variance_qw();
+void defect_variance_qw();
+
 void qw2(int t, QTextStream &out);
 void qw3(int t, QTextStream &out);
 double getVariance(double *p, int t);
@@ -23,62 +29,221 @@ int main(int argc, char *argv[])
     QTextStream out(&file);
 
     // parameters
-    int t = 1000;
+//    int t = 11001;
 
 //    qsrand(0);
 //    qw2(t, out);
-    qw3(t, out);
+//    qw3(t, out);
+
+//    simple_qw();
+//    variance_qw();
+    defect_variance_qw();
 
     qDebug() << "end";
 
     return a.exec();
 }
 
-void qw2(int t, QTextStream &out)
+// Probability density of the quantum walk
+void simple_qw()
 {
+    // open file in write mode
+    QFile file(folderpath + "simple_qw.dat");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    // parameters
+    int t = 100;
+    double theta = M_PI/4;
+//    double theta = 0.1;
+
+    // variables
+    double **c = QW2c::getCoin(theta);
+    QW2c qw(t);
     double *p;
 
-    QW2c qw(t);
-    double **c = QW2c::getCoin(M_PI/4);
-
-    for (int i=0; i<t; i++)
+    // qw
+    for (int i=0; i<t;)
     {
         qw.applyCoin(c);
         qw.applyDisplacement();
-        p = qw.getProbabilities();
+        i++;
+    }
 
-        // probabilities
-        int k = 0;
-        for (int j=-t; j<=t; j++) {
-            out << i+1 << " " << j << " " << p[k] << endl;
-            k++;
-        }
-        out << endl;
-        // variance
-//        out << i+1 << " " << getVariance(p,t) << endl;
+    p = qw.getProbabilities();
+    int j=0;
+    for (int i=-t; i<=t; i++)
+    {
+        if (i%2 == 0)
+            out << (double) i/t << " " << p[j]*t << endl;
+        j++;
+    }
+}
+
+// Variance of the quantum walk
+void variance_qw()
+{
+    // open file in write mode
+    QFile file(folderpath + "variance.dat");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    // parameters
+    int t = 100;
+    double theta = M_PI/4;
+//    double theta = 0.1;
+
+    // variables
+    double **c = QW2c::getCoin(theta);
+    QW2c qw(t);
+    double *p;
+    double v;
+
+    // qw
+    for (int i=0; i<t;)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+        i++;
+
+        p = qw.getProbabilities();
+        v = getVariance(p,t);
+        out << i << " " << v << endl;
+    }
+}
+
+// Variance of the quantum walk with a defect
+void defect_variance_qw()
+{
+    // open file in write mode
+    QFile file(folderpath + "defect_variance.dat");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    // parameters
+    double theta = M_PI/4;
+    double eps = 0.5*acos(-1./(1.+2./sin(theta)));
+    int n_1 = 20;
+    int n_2 = 200;
+    int t = n_1 + n_2 + 1;
+
+    // variables
+    double **c = QW2c::getCoin(theta);
+    double **ce = QW2c::getCoin(theta-eps);
+    QW2c qw(t);
+    double *p;
+    double v;
+    int i = 0;
+
+    // qw
+    while (i<n_1)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+        i++;
+
+        p = qw.getProbabilities();
+        v = getVariance(p,t);
+        out << i << " " << v << endl;
+    }
+
+    qw.applyCoin(ce);
+    qw.applyDisplacement();
+    i++;
+
+    p = qw.getProbabilities();
+    v = getVariance(p,t);
+    out << i << " " << v << endl;
+
+    while (i<t)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+        i++;
+
+        p = qw.getProbabilities();
+        v = getVariance(p,t);
+        out << i << " " << v << endl;
+    }
+}
+
+void qw2(int t, QTextStream &out)
+{
+    double *p;
+    double theta = M_PI/4;
+    double eps = 0.5*acos(-1./(1.+2./sin(theta)));
+    eps = M_PI/2;
+    double test = 1-sin(theta)*cos(eps)*cos(eps)-2*(1-sin(theta))*(sin(eps)/cos(theta))*(sin(eps)/cos(theta));
+    double **c = QW2c::getCoin(theta);
+    double **ce = QW2c::getCoin(theta-eps);
+
+    qDebug() << theta << " " << eps << " " << theta-eps <<" " << test;
+
+    int n_1 = 10;
+    int n_2 = 20;
+    t = n_1 + n_2 + 1;
+    QW2c qw(t);
+    for (int i=0; i<n_1; i++)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+
+        p = qw.getProbabilities();
+        double v = getVariance(p,t);
+        out << log(i+1) << " " << log(v) << endl;
+    }
+
+    qw.applyCoin(ce);
+    qw.applyDisplacement();
+
+    p = qw.getProbabilities();
+    double v = getVariance(p,t);
+    out << log(n_1+1) << " " << log(v) << endl;
+
+    for (int i=0; i<n_2; i++)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+
+        p = qw.getProbabilities();
+        double v = getVariance(p,t);
+        out << log(n_1+2+i) << " " << log(v) << endl;
     }
 }
 
 void qw3(int t, QTextStream &out)
 {
-    double theta = M_PI/5;
+    double theta = M_PI/4;
+    double eps = 0.5*acos(-1./(1.+2./sin(theta)));
 
-    QW3c *qw;
     double P;
     complex **c= QW3c::getCoin(theta);
+    complex **ce = QW3c::getCoin(theta-eps);
 
-    qw = new QW3c(t);
-    for (int k=0; k<t; k++) {
-        qw->applyCoin(c);
-        qw->applyDisplacement();
-        P = qw->getReturnAmplitude();
-        P -= 1 - sin(theta);
-        P -= sqrt(tan(theta)/M_PI)*cos(2*theta*(k+1)+M_PI/4)/sqrt(k+1);
-        P *= (k+1)*sqrt(k+1);
-        double Q = sqrt(tan(theta)/M_PI)/2.;
-        Q *= (tan(theta)-5./tan(theta))/8.;
-        Q *= cos(2*theta*(k+1)+M_PI*3/4);
-        out << k+1 << " " << P << " " << Q << " " << P-Q << endl;
+    QW3c qw(t);
+
+    for (int i=0; i<1000; i++)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+
+        P = qw.getReturnAmplitude();
+        out << i+1 << " " << P << endl;
+    }
+
+    qw.applyCoin(ce);
+    qw.applyDisplacement();
+
+    P = qw.getReturnAmplitude();
+    out << 1001 << " " << P << endl;
+
+    for (int i=0; i<10000; i++)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+
+        P = qw.getReturnAmplitude();
+        out << 1002+i << " " << P << endl;
     }
 }
 

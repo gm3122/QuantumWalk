@@ -8,14 +8,16 @@ QW2c::QW2c(int s)
 {
     t = s;
     for (int i=0; i<2; i++)
-        qw[i] = new Lattice<double>(t, 2*i*t);
+        qw[i] = new Lattice<complex>(t, 2*i*t);
 
     N = 2*t+1;
     p = new double[N];
     for (int i=0; i<N; i++)
         p[i] = 0;
 
-    qw[1]->set(0,1);
+    double a = 1/sqrt(2);
+    qw[0]->set(0, complex(0,a));
+    qw[1]->set(0, complex(a,0));
     step = 0;
 }
 
@@ -37,7 +39,7 @@ double **QW2c::getCoin(double a)
 
 void QW2c::applyCoin(double **c)
 {
-    double temp[2];
+    complex temp[2];
 
     for (int i=-step; i<=step; i++)
     {
@@ -58,11 +60,11 @@ void QW2c::applyDisplacement()
 double *QW2c::getProbabilities()
 {
     int i = 0;
-    double a, b;
+    complex a, b;
     for (int j=-t; j<=t; j++) {
         a = qw[0]->at(j);
         b = qw[1]->at(j);
-        p[i] = a*a+b*b;
+        p[i] = std::norm(a) + std::norm(b);
         i++;
     }
 
