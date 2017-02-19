@@ -24,9 +24,9 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     // open file in write mode
-    QFile file("test.dat");
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&file);
+//    QFile file("test.dat");
+//    file.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out(&file);
 
     // parameters
 //    int t = 11001;
@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
 //    qw3(t, out);
 
 //    simple_qw();
-//    variance_qw();
-    defect_variance_qw();
+    variance_qw();
+//    defect_variance_qw();
 
     qDebug() << "end";
 
@@ -89,9 +89,9 @@ void variance_qw()
     QTextStream out(&file);
 
     // parameters
-    int t = 100;
-    double theta = M_PI/4;
-//    double theta = 0.1;
+    int t = 1000;
+//    double theta = M_PI/4;
+    double theta = M_PI/2 - 1e-2;
 
     // variables
     double **c = QW2c::getCoin(theta);
@@ -109,6 +109,7 @@ void variance_qw()
         p = qw.getProbabilities();
         v = getVariance(p,t);
         out << i << " " << v << endl;
+//        out << i << " " << (v - (1-sin(theta))*i*i)  << endl;
     }
 }
 
@@ -122,9 +123,10 @@ void defect_variance_qw()
 
     // parameters
     double theta = M_PI/4;
-    double eps = 0.5*acos(-1./(1.+2./sin(theta)));
-    int n_1 = 20;
-    int n_2 = 200;
+//    double eps = 0.5*acos(-1./(1.+2./sin(theta)));
+    double eps=M_PI/2;
+    int n_1 = 40;
+    int n_2 = 1000-40-1;
     int t = n_1 + n_2 + 1;
 
     // variables
