@@ -12,6 +12,7 @@ const QString folderpath = "../../Plots/";
 
 void simple_qw();
 void variance_qw();
+void variance_plot();
 void defect_variance_qw();
 
 void qw2(int t, QTextStream &out);
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
 
 //    simple_qw();
     variance_qw();
+//    variance_plot();
 //    defect_variance_qw();
 
     qDebug() << "end";
@@ -84,14 +86,14 @@ void simple_qw()
 void variance_qw()
 {
     // open file in write mode
-    QFile file(folderpath + "variance.dat");
+    QFile file(folderpath + "variance2.dat");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
 
     // parameters
     int t = 1000;
 //    double theta = M_PI/4;
-    double theta = M_PI/2 - 1e-2;
+    double theta = M_PI/2 - 1;
 
     // variables
     double **c = QW2c::getCoin(theta);
@@ -109,7 +111,55 @@ void variance_qw()
         p = qw.getProbabilities();
         v = getVariance(p,t);
         out << i << " " << v << endl;
+//        out << i << " " << QString::number(v, 'g', 17)
+//                 << " " << QString::number((1-sin(theta))*i*i, 'g', 17)
+//                 << " " << v - (1-sin(theta))*i*i
+//            << endl;
 //        out << i << " " << (v - (1-sin(theta))*i*i)  << endl;
+    }
+}
+
+// Variance of the quantum walk
+void variance_plot()
+{
+    // open file in write mode
+    QFile file(folderpath + "variance_plot2.dat");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    // parameters
+    int t = 30;
+    int N = 2000;
+    double theta;
+
+    // variables
+    QW2c *qw;
+    double **c;
+    double *p;
+    double v;
+
+    for (int j=0; j<N; j++)
+    {
+        theta = j*M_PI/N/2;
+        c = QW2c::getCoin(theta);
+        qw = new QW2c(t);
+        // qw
+        for (int i=0; i<t; i++)
+        {
+            qw->applyCoin(c);
+            qw->applyDisplacement();
+        }
+
+        p = qw->getProbabilities();
+        v = getVariance(p,t);
+        v = 1-(1-sin(theta))*t*t/v;
+
+        delete c;
+        delete qw;
+
+        qDebug() << theta << v;
+        out << theta << " " << v << endl;
+
     }
 }
 
