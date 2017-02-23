@@ -93,7 +93,7 @@ void variance_qw()
     // parameters
     int t = 1000;
 //    double theta = M_PI/4;
-    double theta = M_PI/2 - 1;
+    double theta = M_PI/2 - 1e-2;
 
     // variables
     double **c = QW2c::getCoin(theta);
