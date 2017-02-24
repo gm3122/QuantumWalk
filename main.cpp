@@ -86,14 +86,16 @@ void simple_qw()
 void variance_qw()
 {
     // open file in write mode
-    QFile file(folderpath + "variance2.dat");
+//    QFile file(folderpath + "variance2.dat");
+    QFile file(folderpath + "test_var.dat");
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
 
     // parameters
-    int t = 1000;
+    int t = 10000;
 //    double theta = M_PI/4;
-    double theta = M_PI/2 - 1e-2;
+//    double theta = M_PI/2 - 1e-2;
+    double theta = 1.5;
 
     // variables
     double **c = QW2c::getCoin(theta);
@@ -110,7 +112,15 @@ void variance_qw()
 
         p = qw.getProbabilities();
         v = getVariance(p,t);
-        out << i << " " << v << endl;
+
+        double var = (1-sin(theta))*i*i;
+        var += (1+sin(theta)*sin(theta))/(4*sin(theta));
+        var -= sqrt(tan(theta)/M_PI/i)/2/sin(theta)/sin(theta)*cos(2*theta*i+M_PI/4);
+//        var -= sqrt(tan(theta)/M_PI/i)/2/sin(theta)/sin(theta)*cos(2*theta*i+3*M_PI/4)
+//                *(tan(theta)-13/tan(theta))/(16*i);
+        out << i << " " << (var - v)*sqrt(i) << endl;
+
+//        out << i << " " << v << endl;
 //        out << i << " " << QString::number(v, 'g', 17)
 //                 << " " << QString::number((1-sin(theta))*i*i, 'g', 17)
 //                 << " " << v - (1-sin(theta))*i*i
