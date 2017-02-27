@@ -37,9 +37,9 @@ int main(int argc, char *argv[])
 //    qw3(t, out);
 
 //    simple_qw();
-    variance_qw();
+//    variance_qw();
 //    variance_plot();
-//    defect_variance_qw();
+    defect_variance_qw();
 
     qDebug() << "end";
 
@@ -197,6 +197,16 @@ void defect_variance_qw()
     double v;
     int i = 0;
 
+    // analytical asymptote
+    double a[t+1];
+    double a_1 = 1-std::abs(sin(theta));
+    double a_2 = 1-std::abs(sin(theta))*cos(eps)*cos(eps)
+                  -2*a_1*sin(eps)*sin(eps)/cos(theta)/cos(theta);
+    for (int j=0; j<n_1; j++)
+        a[j] = a_1*j*j;
+    for (int j=n_1; j<=t; j++)
+        a[j] = a_1*(n_1*n_1+(j-n_1)*(j-n_1))+a_2*(j-n_1)*n_1;
+
     // qw
     while (i<n_1)
     {
@@ -206,7 +216,7 @@ void defect_variance_qw()
 
         p = qw.getProbabilities();
         v = getVariance(p,t);
-        out << i << " " << v << endl;
+        out << i << " " << v << " " << a[i] << endl;
     }
 
     qw.applyCoin(ce);
@@ -215,7 +225,7 @@ void defect_variance_qw()
 
     p = qw.getProbabilities();
     v = getVariance(p,t);
-    out << i << " " << v << endl;
+    out << i << " " << v << " " << a[i] << endl;
 
     while (i<t)
     {
@@ -225,7 +235,7 @@ void defect_variance_qw()
 
         p = qw.getProbabilities();
         v = getVariance(p,t);
-        out << i << " " << v << endl;
+        out << i << " " << v << " " << a[i] << endl;
     }
 }
 
