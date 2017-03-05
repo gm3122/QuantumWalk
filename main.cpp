@@ -14,6 +14,7 @@ void simple_qw();
 void variance_qw();
 void variance_plot();
 void defect_variance_qw();
+void defect_qw3();
 
 void qw2(int t, QTextStream &out);
 void qw3(int t, QTextStream &out);
@@ -39,7 +40,8 @@ int main(int argc, char *argv[])
 //    simple_qw();
 //    variance_qw();
 //    variance_plot();
-    defect_variance_qw();
+//    defect_variance_qw();
+    defect_qw3();
 
     qDebug() << "end";
 
@@ -184,10 +186,9 @@ void defect_variance_qw()
     // parameters
     double theta = M_PI/4;
 //    double eps = 0.5*acos(-1./(1.+2./sin(theta)));
-    double eps=M_PI/2;
+    double eps = M_PI/2;
     int n_1 = 40;
-    int n_2 = 1000-40-1;
-    int t = n_1 + n_2 + 1;
+    int t = 1000;
 
     // variables
     double **c = QW2c::getCoin(theta);
@@ -205,7 +206,7 @@ void defect_variance_qw()
     for (int j=0; j<n_1; j++)
         a[j] = a_1*j*j;
     for (int j=n_1; j<=t; j++)
-        a[j] = a_1*(n_1*n_1+(j-n_1)*(j-n_1))+a_2*(j-n_1)*n_1;
+        a[j] = a_1*(n_1*n_1+(j-n_1)*(j-n_1))+a_2*2*(j-n_1)*n_1;
 
     // qw
     while (i<n_1)
@@ -216,7 +217,7 @@ void defect_variance_qw()
 
         p = qw.getProbabilities();
         v = getVariance(p,t);
-        out << i << " " << v << " " << a[i] << endl;
+        out << i << " " << v << " " << a[i] << " " << std::abs(1 - a[i]/v) << endl;
     }
 
     qw.applyCoin(ce);
@@ -225,7 +226,7 @@ void defect_variance_qw()
 
     p = qw.getProbabilities();
     v = getVariance(p,t);
-    out << i << " " << v << " " << a[i] << endl;
+    out << i << " " << v << " " << a[i] << " " << std::abs(1 - a[i]/v) << endl;
 
     while (i<t)
     {
@@ -235,7 +236,59 @@ void defect_variance_qw()
 
         p = qw.getProbabilities();
         v = getVariance(p,t);
-        out << i << " " << v << " " << a[i] << endl;
+        out << i << " " << v << " " << a[i] << " " << std::abs(1 - a[i]/v) << endl;
+    }
+}
+
+void defect_qw3()
+{
+    // open file in write mode
+    QFile file(folderpath + "defect_qw3.dat");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    // parameters
+    double theta = M_PI/4;
+    double eps = M_PI/2;
+    int n_1 = 40;
+    int t = 100;
+
+    // variables
+    int i = 0;
+    double P;
+    complex **c= QW3c::getCoin(theta);
+    complex **ce = QW3c::getCoin(theta-eps);
+    QW3c qw(t);
+
+    double a_theta = 1 - std::abs(sin(theta));
+    double a_eps = 1 - std::abs(sin(theta))*cos(eps)*cos(eps) - 2*a_theta*sin(eps)*sin(eps)/cos(theta)/cos(theta);
+
+    // qw
+    while (i<n_1)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+        i++;
+
+        P = qw.getReturnAmplitude();
+        out << i << " " << P << " " << a_theta << endl;
+    }
+
+    qw.applyCoin(ce);
+    qw.applyDisplacement();
+    i++;
+
+    P = qw.getReturnAmplitude();
+    out << i << " " << P << " " << a_eps << endl;
+
+    while (i<t)
+    {
+        qw.applyCoin(c);
+        qw.applyDisplacement();
+        i++;
+
+        P = qw.getReturnAmplitude();
+        out << i << " " << P << " " << a_eps << endl;
     }
 }
 
